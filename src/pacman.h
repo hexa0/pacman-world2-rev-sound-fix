@@ -1,8 +1,8 @@
 #ifndef PACMAN_H
 #define PACMAN_H
 
-// all the external functions come from game.syms extracted like this:
-// mips64r5900el-ps2-elf-nm -f posix SLUS_202.24 | grep " T " | awk '{print $1 " = 0x" $3 ";"}' > game.syms
+// all the externs come from game.syms extracted like this:
+// mips64r5900el-ps2-elf-nm -f posix SLUS_202.24 | grep -E " [TDB] " | awk '{print $1 " = 0x" $3 ";"}' > game.syms
 // im unsure if other versions have full debug symbols, but this is for SLUS 2.0 specifically
 
 
@@ -24,7 +24,7 @@ extern int printf(const char *format, ...);
 
 ///////// pmw2 headers /////////
 
-typedef struct
+typedef struct ACTIVESOUNDS
 {
 	/// @brief this is 1 if the sound is active, zero if it is inactive
 	int status;
@@ -39,12 +39,10 @@ typedef struct
 	int voll;
 	/// @brief if status is 0 this is not reset normally
 	int volr;
-} ACTIVESOUNDS;
+} active_sounds_t;
 
-/// active_sounds addr
-#define ACTIVE_SOUNDS_ADDR 0x46ac20
-/// active_sounds size
-#define ARRAY_SIZE 48
+#define ACTIVE_SOUNDS_SIZE 48
+extern active_sounds_t active_sounds[ACTIVE_SOUNDS_SIZE];
 
 extern void soundUpdate(void);
 
