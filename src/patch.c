@@ -1,8 +1,7 @@
 #include "pacman.h"
-#include "stdio.h"
 
 // from the NSTC US 2.0 debug symbols
-typedef struct ACTIVESOUNDS
+typedef struct
 {
 	/// @brief this is 1 if the sound is active, zero if it is inactive
 	int status;
@@ -17,7 +16,7 @@ typedef struct ACTIVESOUNDS
 	int voll;
 	/// @brief if status is 0 this is not reset normally
 	int volr;
-} active_sounds_t;
+} ACTIVESOUNDS;
 
 /// active_sounds addr
 #define ACTIVE_SOUNDS_ADDR 0x46ac20
@@ -26,7 +25,7 @@ typedef struct ACTIVESOUNDS
 
 void pmw2_pre_sound_update_hook()
 {
-	active_sounds_t *sounds = (active_sounds_t *)ACTIVE_SOUNDS_ADDR;
+	ACTIVESOUNDS *sounds = (ACTIVESOUNDS *)ACTIVE_SOUNDS_ADDR;
 
 	for (int i = 0; i < ARRAY_SIZE; i++)
 	{
