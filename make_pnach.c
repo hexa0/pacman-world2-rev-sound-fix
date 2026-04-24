@@ -6,8 +6,15 @@
 #define CAVE_ADDR 0x00556AD0
 #define SOUND_UPDATE_CALL_ADDR 0x0029938C
 
-int main()
+int main(int argc, char *argv[])
 {
+	if (argc < 2) {
+		fprintf(stderr, "bad args\n");
+		return 1;
+	}
+
+	uint32_t entry_ram_addr = (uint32_t)strtoul(argv[1], NULL, 16);
+
 	FILE *bin = fopen(".tmp/patch.bin", "rb");
 
 	if (!bin)
@@ -32,13 +39,16 @@ int main()
 
 	while (fread(&byte, 1, 1, bin) == 1)
 	{
-		fprintf(out, "patch=1,EE,%08x,byte,%02x\n", current_addr, byte);
+		// unlike the hook we set this to apply on startup only
+		// sadly this breaks hot reloading though, but it's the price to pay so that
+		// values aren't constantly reset
+		fprintf(out, "patch=0,EE,%08x,byte,%02x\n", current_addr, byte);
 		current_addr++;
 	}
 
 	fclose(bin);
 
-	uint32_t jal_val = (CAVE_ADDR >> 2) | 0x0C000000;
+	uint32_t jal_val = (entry_ram_addr >> 2) | 0x0C000000;
 
 	uint8_t hook_bytes[4];
 	hook_bytes[0] = jal_val & 0xFF;
