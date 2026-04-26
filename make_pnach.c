@@ -3,8 +3,8 @@
 #include <stdint.h>
 
 #define GAME_CRC "E7EA3288"
-#define CAVE_ADDR 0x00556AD0
-#define SOUND_UPDATE_CALL_ADDR 0x0029938C
+#define CODE_CAVE_ADDR 0x00556A90
+#define MAIN_CALL_ADDR 0x002B7870
 
 int main(int argc, char *argv[])
 {
@@ -15,11 +15,11 @@ int main(int argc, char *argv[])
 
 	uint32_t entry_ram_addr = (uint32_t)strtoul(argv[1], NULL, 16);
 
-	FILE *bin = fopen(".tmp/patch.bin", "rb");
+	FILE *bin = fopen(".tmp/main.bin", "rb");
 
 	if (!bin)
 	{
-		fprintf(stderr, "Error: Could not open .tmp/patch.bin\n");
+		fprintf(stderr, "Error: Could not open .tmp/main.bin\n");
 		return 1;
 	}
 
@@ -28,14 +28,14 @@ int main(int argc, char *argv[])
 	FILE *out = fopen(filename, "w");
 
 	fprintf(out, "gametitle=Pac-Man World 2 (U)(SLUS-20224) (Greatest Hits)\n");
-	fprintf(out, "comment=Fixes the ringing sound after revving up\n\n");
-	fprintf(out, "[Fix Tinnitus Sound Glitch]\n");
+	fprintf(out, "comment=Mod Test\n\n");
+	fprintf(out, "[Mod]\n");
 	fprintf(out, "author=hexa.pet\n");
 
 	uint8_t byte;
-	uint32_t current_addr = CAVE_ADDR;
+	uint32_t current_addr = CODE_CAVE_ADDR;
 
-	fprintf(out, "// inject pmw2_pre_sound_update_hook\n");
+	fprintf(out, "// code\n");
 
 	while (fread(&byte, 1, 1, bin) == 1)
 	{
@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
 	hook_bytes[2] = (jal_val >> 16) & 0xFF;
 	hook_bytes[3] = (jal_val >> 24) & 0xFF;
 
-	fprintf(out, "// hook soundUpdate call\n");
+	fprintf(out, "// init hook\n");
 
 	for (int i = 0; i < 4; i++)
 	{
-		fprintf(out, "patch=1,EE,%08x,byte,%02x\n", SOUND_UPDATE_CALL_ADDR + i, hook_bytes[i]);
+		fprintf(out, "patch=0,EE,%08x,byte,%02x\n", MAIN_CALL_ADDR + i, hook_bytes[i]);
 	}
 
 	fclose(out);
